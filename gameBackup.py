@@ -1,8 +1,10 @@
 # -*- coding: utf-8 -*-
+
+# -*- coding: utf-8 -*-
 """
 ENG 1600
 
-the snake game class
+for human player
 """
 
 import random
@@ -17,8 +19,8 @@ from pygame.locals import *
 class SnakeGame(object):
     # class attributes
     # a 50x50 gameboard
-    window_height = 100
-    window_width = 100
+    window_height = 1000
+    window_width = 1000
     cell_size = 20
     board_height = int(window_height/cell_size) #5 10 20
     board_width = int(window_width/cell_size)  # 5 10 20
@@ -39,18 +41,32 @@ class SnakeGame(object):
     
     def __init__(self):
         pygame.init()
-        self.speed = 1
+        self.speed = 15
         self.speed_clock = pygame.time.Clock()
         self.score = 0
         self.maxScore = SnakeGame.board_height * SnakeGame.board_width * 10
         self.alive = True
-        self.canPlay = True
-        self.canRestart = True
-        self.initialize()
-#        print('init state: ')
-#        print(self.get_game_board())
+
+    
+    def restart(self):
+        time.sleep(1)
+        self.score = 0
+        self.alive = True
+        #self.run() #  or main()
+    
+    def main(self):
+        self.screen = pygame.display.set_mode((SnakeGame.window_width, SnakeGame.window_height))
+        self.screen.fill(SnakeGame.white)
+        pygame.display.set_caption("ENG 1600: SmartSnake")
         
-    def initialize(self):
+        while True:
+            self.run()
+            print('Got Score: ', self.score)
+            if True:
+                self.restart()
+		#show_gameover_info
+    
+    def run(self):
         # start from the center
         init_x = int(SnakeGame.board_width/2)
         init_y = int(SnakeGame.board_height/2)
@@ -61,81 +77,8 @@ class SnakeGame(object):
         self.direction = SnakeGame.RIGHT
         
         self.food = self.generate_food() # random food location
-    
-    def restart(self):
-        time.sleep(1)
-        self.score = 0
-        self.alive = True
-        self.initialize()
-        #self.run() #  or main()
-    
-    def main(self):
-        self.screen = pygame.display.set_mode((SnakeGame.window_width, SnakeGame.window_height))
-        self.screen.fill(SnakeGame.white)
-        pygame.display.set_caption("ENG 1600: SmartSnake")
         
-
-#self.run()
-        self.play_one_step()
-        print(self.get_game_board())
-        if True and not self.alive:
-#       if self.canRestart:
-            print('Got Score: ', self.score, 'isAlive: ', self.alive)
-            self.restart()
-#       else:
-#           pygame.quit()
-#           sys.exit()
-		#show_gameover_info
-    
-    #like a mutex lock
-    def can_play(self):
-        self.canPlay = True  
-        
-    def can_restart(self):
-        self.canRestart = True
-    
-    def play_one_step(self):
-        print('Snake game: do action A')
-        for event in pygame.event.get():
-            if event.type == QUIT:
-                pygame.quit()
-                sys.exit()
-                #self.restart()
-            elif event.type == KEYDOWN:
-                if event.key == K_LEFT and self.direction != SnakeGame.RIGHT:
-                    self.direction = SnakeGame.LEFT
-                elif event.key == K_RIGHT and self.direction != SnakeGame.LEFT:
-                    self.direction = SnakeGame.RIGHT
-                elif event.key == K_UP and self.direction != SnakeGame.DOWN:
-                    self.direction = SnakeGame.UP
-                elif event.key == K_DOWN and self.direction != SnakeGame.UP:
-                    self.direction = SnakeGame.DOWN
-            
-        print(self.get_game_board())            
-        self.move_snake()
-        self.alive = self.check_alive()
-            
-        self.canPlay = False # wait for agent to play
-        self.canRestart = False
-            
-        time.sleep(1)
-            
-        if not self.alive:
-            print('end')
-            
-        self.check_food()
-        #print(self.get_game_board())
-        self.score = (len(self.snake_body) - 3) * 10
-        self.draw_game()
-            
-        pygame.display.update()
-        self.speed_clock.tick(self.speed)
-        
-    def run(self):        
         while True:
-#        while self.canPlay:
-            
-            print('Snake game: do action A')
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()
@@ -150,15 +93,9 @@ class SnakeGame(object):
                         self.direction = SnakeGame.UP
                     elif event.key == K_DOWN and self.direction != SnakeGame.UP:
                         self.direction = SnakeGame.DOWN
-            
-            print(self.get_game_board())            
+                        
             self.move_snake()
             self.alive = self.check_alive()
-            
-            self.canPlay = False # wait for agent to play
-            self.canRestart = False
-            
-            time.sleep(1)
             
             if not self.alive:
                 break
@@ -170,15 +107,6 @@ class SnakeGame(object):
             
             pygame.display.update()
             self.speed_clock.tick(self.speed)
-            
-            
-    
-    #control method for the rl agent
-    def control(self, direction):
-        if direction in [0,1,2,3]:
-            self.direction = direction
-        else:
-            print('action undefined!!')
         
     def generate_food(self):
         Loc = {'x': random.randint(0, SnakeGame.board_width - 1), 'y': random.randint(0, SnakeGame.board_height - 1)}
@@ -252,14 +180,11 @@ class SnakeGame(object):
         
     def get_game_board(self):
         #in RL agent, turn it to a tuple to make it hashable
-        #game is n*n ==> state is (n+1)*(n+1)
-        mat = np.zeros((self.board_height+2, self.board_width+2))
-        mat[self.food['y']+1][self.food['x']+1] = 3
-        head = self.snake_body[0]
-        mat[head['y']+1][head['x']+1] = 2
-        for node in self.snake_body[1:]:
+        mat = np.zeros((self.board_height, self.board_width))
+        mat[self.food['y']][self.food['x']] = 2
+        for node in self.snake_body:
             # notice the order!!!!
-            mat[node['y']+1][node['x']+1] = 1
+            mat[node['y']][node['x']] = 1
         
         return mat
     
