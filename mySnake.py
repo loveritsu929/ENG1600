@@ -17,11 +17,11 @@ from pygame.locals import *
 class SnakeGame(object):
     # class attributes
     # a 50x50 gameboard
-    window_height = 400
-    window_width = 400
+    window_height = 100
+    window_width = 100
     cell_size = 20
-    board_height = int(window_height/cell_size) #20
-    board_width = int(window_width/cell_size)  #20
+    board_height = int(window_height/cell_size) #5 10 20
+    board_width = int(window_width/cell_size)  # 5 10 20
 
     # define the colors
     white = (255, 255, 255)
@@ -32,23 +32,26 @@ class SnakeGame(object):
     blue = (0, 0, 255)
 
     # define the directions
-    UP = 1
-    DOWN = 2
-    LEFT = 3
-    RIGHT = 4
+    UP = 0
+    DOWN = 1
+    LEFT = 2
+    RIGHT = 3
     
     def __init__(self):
         pygame.init()
-        self.speed = 15
+        self.speed = 1
         self.speed_clock = pygame.time.Clock()
         self.score = 0
+        self.maxScore = SnakeGame.board_height * SnakeGame.board_width * 10
         self.alive = True
+        self.canPlay = False
+        self.canRestart = False
     
     def restart(self):
         time.sleep(1)
         self.score = 0
         self.alive = True
-        self.run() #  or main()
+        #self.run() #  or main()
     
     def main(self):
         self.screen = pygame.display.set_mode((SnakeGame.window_width, SnakeGame.window_height))
@@ -58,9 +61,18 @@ class SnakeGame(object):
         while True:
             self.run()
             print('Got Score: ', self.score)
-            self.restart()
+            #if True:
+            if self.canRestart:
+                self.restart()
 		#show_gameover_info
-            
+    
+    #like a mutex lock
+    def can_play(self):
+        self.canPlay = True  
+        
+    def can_restart(self):
+        self.canRestart = True
+    
     def run(self):
         # start from the center
         init_x = int(SnakeGame.board_width/2)
@@ -74,6 +86,7 @@ class SnakeGame(object):
         self.food = self.generate_food() # random food location
         
         while True:
+        #while self.canPlay:
             for event in pygame.event.get():
                 if event.type == QUIT:
                     pygame.quit()
@@ -92,17 +105,28 @@ class SnakeGame(object):
             self.move_snake()
             self.alive = self.check_alive()
             
+            self.canPlay = False # wait for agent to play
+            self.canRestart = False
+            
             if not self.alive:
                 break
             
             self.check_food()
-            #print(self.getGameBoard())
+            #print(self.get_game_board())
             self.score = (len(self.snake_body) - 3) * 10
             self.draw_game()
             
             pygame.display.update()
             self.speed_clock.tick(self.speed)
             
+    
+    #control method for the rl agent
+    def control(self, direction):
+        if direction in [0,1,2,3]:
+            self.direction = direction
+        else:
+            print('action undefined!!')
+        
     def generate_food(self):
         Loc = {'x': random.randint(0, SnakeGame.board_width - 1), 'y': random.randint(0, SnakeGame.board_height - 1)}
         while Loc in self.snake_body:
@@ -167,13 +191,13 @@ class SnakeGame(object):
         pygame.draw.rect(self.screen, SnakeGame.red, pygame.Rect(x, y, SnakeGame.cell_size, SnakeGame.cell_size))
         
         #draw score
-        font = pygame.font.SysFont('arial', 30)
+        font = pygame.font.SysFont('arial', 20)
         scoreSurf = font.render('Score: %s' % self.score, True, SnakeGame.white)
         scoreRect = scoreSurf.get_rect()
-        scoreRect.topleft = (SnakeGame.window_width - 200, 10)
+        scoreRect.topleft = (int(SnakeGame.window_width / 2) - 20, 10)
         self.screen.blit(scoreSurf, scoreRect)
         
-    def getGameBoard(self):
+    def get_game_board(self):
         #in RL agent, turn it to a tuple to make it hashable
         mat = np.zeros((self.board_height, self.board_width))
         mat[self.food['y']][self.food['x']] = 2
@@ -181,7 +205,6 @@ class SnakeGame(object):
             # notice the order!!!!
             mat[node['y']][node['x']] = 1
         
-            
         return mat
     
     #def terminate(self):
