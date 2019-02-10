@@ -167,7 +167,7 @@ class SnakeGame(object):
         pygame.draw.rect(self.screen, SnakeGame.red, pygame.Rect(x, y, SnakeGame.cell_size, SnakeGame.cell_size))
         
         #draw score
-        font = pygame.font.Font('YaHei Consolas.ttf', 30)
+        font = pygame.font.SysFont('arial', 30)
         scoreSurf = font.render('Score: %s' % self.score, True, SnakeGame.white)
         scoreRect = scoreSurf.get_rect()
         scoreRect.topleft = (SnakeGame.window_width - 200, 10)
