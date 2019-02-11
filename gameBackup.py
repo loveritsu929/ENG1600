@@ -19,8 +19,8 @@ from pygame.locals import *
 class SnakeGame(object):
     # class attributes
     # a 50x50 gameboard
-    window_height = 1000
-    window_width = 1000
+    window_height = 100
+    window_width = 100
     cell_size = 20
     board_height = int(window_height/cell_size) #5 10 20
     board_width = int(window_width/cell_size)  # 5 10 20
@@ -41,7 +41,7 @@ class SnakeGame(object):
     
     def __init__(self):
         pygame.init()
-        self.speed = 15
+        self.speed = 1
         self.speed_clock = pygame.time.Clock()
         self.score = 0
         self.maxScore = SnakeGame.board_height * SnakeGame.board_width * 10

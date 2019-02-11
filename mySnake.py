@@ -67,15 +67,13 @@ class SnakeGame(object):
         self.score = 0
         self.alive = True
         self.initialize()
-        #self.run() #  or main()
+        
     
     def main(self):
         self.screen = pygame.display.set_mode((SnakeGame.window_width, SnakeGame.window_height))
         self.screen.fill(SnakeGame.white)
         pygame.display.set_caption("ENG 1600: SmartSnake")
         
-
-#self.run()
         self.play_one_step()
         print(self.get_game_board())
         if True and not self.alive:
@@ -101,15 +99,15 @@ class SnakeGame(object):
                 pygame.quit()
                 sys.exit()
                 #self.restart()
-            elif event.type == KEYDOWN:
-                if event.key == K_LEFT and self.direction != SnakeGame.RIGHT:
-                    self.direction = SnakeGame.LEFT
-                elif event.key == K_RIGHT and self.direction != SnakeGame.LEFT:
-                    self.direction = SnakeGame.RIGHT
-                elif event.key == K_UP and self.direction != SnakeGame.DOWN:
-                    self.direction = SnakeGame.UP
-                elif event.key == K_DOWN and self.direction != SnakeGame.UP:
-                    self.direction = SnakeGame.DOWN
+#            elif event.type == KEYDOWN:
+#                if event.key == K_LEFT and self.direction != SnakeGame.RIGHT:
+#                    self.direction = SnakeGame.LEFT
+#                elif event.key == K_RIGHT and self.direction != SnakeGame.LEFT:
+#                    self.direction = SnakeGame.RIGHT
+#                elif event.key == K_UP and self.direction != SnakeGame.DOWN:
+#                    self.direction = SnakeGame.UP
+#                elif event.key == K_DOWN and self.direction != SnakeGame.UP:
+#                    self.direction = SnakeGame.DOWN
             
         print(self.get_game_board())            
         self.move_snake()
@@ -131,48 +129,6 @@ class SnakeGame(object):
         pygame.display.update()
         self.speed_clock.tick(self.speed)
         
-    def run(self):        
-        while True:
-#        while self.canPlay:
-            
-            print('Snake game: do action A')
-            for event in pygame.event.get():
-                if event.type == QUIT:
-                    pygame.quit()
-                    sys.exit()
-                    #self.restart()
-                elif event.type == KEYDOWN:
-                    if event.key == K_LEFT and self.direction != SnakeGame.RIGHT:
-                        self.direction = SnakeGame.LEFT
-                    elif event.key == K_RIGHT and self.direction != SnakeGame.LEFT:
-                        self.direction = SnakeGame.RIGHT
-                    elif event.key == K_UP and self.direction != SnakeGame.DOWN:
-                        self.direction = SnakeGame.UP
-                    elif event.key == K_DOWN and self.direction != SnakeGame.UP:
-                        self.direction = SnakeGame.DOWN
-            
-            print(self.get_game_board())            
-            self.move_snake()
-            self.alive = self.check_alive()
-            
-            self.canPlay = False # wait for agent to play
-            self.canRestart = False
-            
-            time.sleep(1)
-            
-            if not self.alive:
-                break
-            
-            self.check_food()
-            #print(self.get_game_board())
-            self.score = (len(self.snake_body) - 3) * 10
-            self.draw_game()
-            
-            pygame.display.update()
-            self.speed_clock.tick(self.speed)
-            
-            
-    
     #control method for the rl agent
     def control(self, direction):
         if direction in [0,1,2,3]:
