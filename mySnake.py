@@ -144,6 +144,9 @@ class SnakeGame(object):
         return Loc  
     
     def move_snake(self):
+        # if end, do nothing
+        if not self.check_alive():
+            return
         if self.direction == SnakeGame.UP:
             newHead = {'x': self.snake_body[0]['x'], 'y': self.snake_body[0]['y'] - 1}
         elif self.direction == SnakeGame.DOWN:
@@ -172,6 +175,9 @@ class SnakeGame(object):
         return alive
         
     def check_food(self):
+        # if end, do nothing
+        if not self.check_alive():
+            return
         if self.snake_body[0]['x'] == self.food['x'] and self.snake_body[0]['y'] == self.food['y']:
             self.food = self.generate_food()
         else:
