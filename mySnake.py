@@ -48,7 +48,7 @@ class SnakeGame(object):
         self.canRestart = True
         self.initialize()
 #        print('init state: ')
-#        print(self.get_game_board())
+        print('Init: \n', self.get_game_board(),'\n')
         
     def initialize(self):
         # start from the center
@@ -75,7 +75,7 @@ class SnakeGame(object):
         pygame.display.set_caption("ENG 1600: SmartSnake")
         
         self.play_one_step()
-        print(self.get_game_board())
+        
         if True and not self.alive:
 #       if self.canRestart:
             print('Got Score: ', self.score, 'isAlive: ', self.alive)
@@ -108,8 +108,9 @@ class SnakeGame(object):
 #                    self.direction = SnakeGame.UP
 #                elif event.key == K_DOWN and self.direction != SnakeGame.UP:
 #                    self.direction = SnakeGame.DOWN
-            
-        print(self.get_game_board())            
+        
+        #TODO: restrictions for rlagent
+                   
         self.move_snake()
         self.alive = self.check_alive()
             
@@ -128,13 +129,18 @@ class SnakeGame(object):
             
         pygame.display.update()
         self.speed_clock.tick(self.speed)
+        print(self.get_game_board(), '\n')
         
     #control method for the rl agent
     def control(self, direction):
-        if direction in [0,1,2,3]:
+        assert direction in [0,1,2,3]
+        if direction == SnakeGame.UP and self.direction != SnakeGame.DOWN or \
+        direction == SnakeGame.DOWN and self.direction != SnakeGame.UP or \
+        direction == SnakeGame.LEFT and self.direction != SnakeGame.RIGHT or \
+        direction == SnakeGame.RIGHT and self.direction != SnakeGame.LEFT:
             self.direction = direction
         else:
-            print('action undefined!!')
+            print('Do nothing')
         
     def generate_food(self):
         Loc = {'x': random.randint(0, SnakeGame.board_width - 1), 'y': random.randint(0, SnakeGame.board_height - 1)}
@@ -215,13 +221,24 @@ class SnakeGame(object):
     def get_game_board(self):
         #in RL agent, turn it to a tuple to make it hashable
         #game is n*n ==> state is (n+1)*(n+1)
-        mat = np.zeros((self.board_height+2, self.board_width+2))
-        mat[self.food['y']+1][self.food['x']+1] = 3
+        #mat = np.zeros((self.board_height+2, self.board_width+2))
+        #mat[self.food['y']+1][self.food['x']+1] = 3
+        #head = self.snake_body[0]
+        #mat[head['y']+1][head['x']+1] = 2
+        #for node in self.snake_body[1:]:
+            # notice the order!!!!
+            #mat[node['y']+1][node['x']+1] = 1
+        
+        #return mat
+        mat = np.zeros((self.board_height, self.board_width))
+        if self.alive == False:
+            return mat
+        mat[self.food['y']][self.food['x']] = 3
         head = self.snake_body[0]
-        mat[head['y']+1][head['x']+1] = 2
+        mat[head['y']][head['x']] = 2
         for node in self.snake_body[1:]:
             # notice the order!!!!
-            mat[node['y']+1][node['x']+1] = 1
+            mat[node['y']][node['x']] = 1
         
         return mat
     

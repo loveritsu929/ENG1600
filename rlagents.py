@@ -13,6 +13,7 @@ from mySnake import SnakeGame
 
 model_file = './learned_model.mdl'
 
+action_dict = {0:'UP' , 1:'DOWN', 2:'LEFT', 3:'RIGHT'}
 EPSILON = 0.7 # Prob. of exploit learned rules
 ALPHA = 0.1 # RL learning rate
 BETA = -0.5 # penalty factor for ending early
@@ -70,7 +71,7 @@ class SimpleAgent(object):
     def play(self):
         # play 'ep' times
         print("start to play")
-        for epoch in range(10):
+        for epoch in range(1):
             terminated = False
             alreadyStarted = False
             # load the learned model
@@ -80,10 +81,10 @@ class SimpleAgent(object):
             
             # play the game
             while not terminated:
-                #time.sleep(1)
+                time.sleep(1)
                 print(' ')
                 prev_state, A, prev_Q = self.choose_action()
-                print('choose A')
+                print('choose A: ', action_dict[A])
                 self.prev_state = prev_state
                 self.prev_len = len(self.game.snake_body)
                 self.prev_manhattan = self.manhattan()
