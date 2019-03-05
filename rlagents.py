@@ -27,6 +27,10 @@ class SimpleAgent(object):
     def __init__(self):
         self.game = mySnake.SnakeGame()
         self.q_dict = {} # {game_state: ndarray [Q-values for actions]}
+        # load the learned model
+        if os.path.isfile(model_file):
+            with open(model_file, 'rb') as fp:
+                self.q_dict = pickle.load(fp)
     
     def manhattan(self):
         return abs(self.game.food['x']-self.game.snake_body[0]['x']) + abs(self.game.food['y']-self.game.snake_body[0]['y'])
@@ -71,13 +75,9 @@ class SimpleAgent(object):
     def play(self):
         # play 'ep' times
         print("start to play")
-        for epoch in range(1):
+        for epoch in range(100):
             terminated = False
             alreadyStarted = False
-            # load the learned model
-            if os.path.isfile(model_file):
-                with open(model_file, 'rb') as fp:
-                    self.q_dict = pickle.load(fp)
             
             # play the game
             while not terminated:
@@ -108,8 +108,6 @@ class SimpleAgent(object):
                 # get feedback
                 terminated = not self.game.alive
                 R = self.get_reward(terminated)
-                
-                
                 
                 # Q <-- Q + alpha* (R + gamma*max_future_Q - Q)
                 target_Q = R + GAMMA * self.lookup_dict(new_state).max()

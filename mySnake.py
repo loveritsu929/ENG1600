@@ -42,6 +42,7 @@ class SnakeGame(object):
         self.speed = 1
         self.speed_clock = pygame.time.Clock()
         self.score = 0
+        self.ate = 0
         self.maxScore = SnakeGame.board_height * SnakeGame.board_width * 10
         self.alive = True
         self.canPlay = True
@@ -65,6 +66,7 @@ class SnakeGame(object):
     def restart(self):
         time.sleep(1)
         self.score = 0
+        self.ate = 0
         self.alive = True
         self.initialize()
         
@@ -124,7 +126,7 @@ class SnakeGame(object):
             
         self.check_food()
         #print(self.get_game_board())
-        self.score = (len(self.snake_body) - 3) * 10
+        self.score = self.ate*10 #(len(self.snake_body) - 3) * 10
         self.draw_game()
             
         pygame.display.update()
@@ -186,6 +188,7 @@ class SnakeGame(object):
             return
         if self.snake_body[0]['x'] == self.food['x'] and self.snake_body[0]['y'] == self.food['y']:
             self.food = self.generate_food()
+            self.ate += 1
         else:
             self.snake_body.pop(-1)
         
