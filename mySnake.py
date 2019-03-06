@@ -12,8 +12,6 @@ import sys
 import numpy as np
 from pygame.locals import *
 
-
-
 class SnakeGame(object):
     # class attributes
     # a 50x50 gameboard
