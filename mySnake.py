@@ -131,13 +131,17 @@ class SnakeGame(object):
         self.speed_clock.tick(self.speed)
         print(self.get_game_board(), '\n')
         
-    #control method for the rl agent
-    def control(self, direction):
+    def is_valid_move(self, direction):
         assert direction in [0,1,2,3]
-        if direction == SnakeGame.UP and self.direction != SnakeGame.DOWN or \
+        valid = direction == SnakeGame.UP and self.direction != SnakeGame.DOWN or \
         direction == SnakeGame.DOWN and self.direction != SnakeGame.UP or \
         direction == SnakeGame.LEFT and self.direction != SnakeGame.RIGHT or \
-        direction == SnakeGame.RIGHT and self.direction != SnakeGame.LEFT:
+        direction == SnakeGame.RIGHT and self.direction != SnakeGame.LEFT
+        return valid
+    
+    #control method for the rl agent
+    def control(self, direction):
+        if self.is_valid_move(direction):
             self.direction = direction
         else:
             print('Do nothing')
@@ -242,7 +246,15 @@ class SnakeGame(object):
             mat[node['y']][node['x']] = 1
         
         return mat
+   
     
+class PFSnake(SnakeGame):
+    def findPath():
+        return 0
+    
+    def findTail():
+        return 0
+        
     #def terminate(self):
 if __name__ == '__main__':
     game = SnakeGame()
