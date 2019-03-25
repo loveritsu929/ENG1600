@@ -8,10 +8,10 @@ import numpy as np
 #with open('./testpickle', 'rb') as fp:
 #    print(type(pickle.load(fp)))
 
-from gameBackup import SnakeGame
-
-game = SnakeGame()
-game.main()
+#from gameBackup import SnakeGame
+#
+#game = SnakeGame()
+#game.main()
 
 #q_dict = {}
 #with open('./learned_model.mdl', 'rb') as fp:
@@ -22,4 +22,16 @@ game.main()
 #    #k: tuple
 #    mat = np.array(k).reshape(7,-1)
 #    print('Game State: \n', mat, '\nAction values: ', v, '\n')
+
+class testclass():
+    
+    def __init__(self):
+        self.a = 1
+        
+    def echo(self, line = self.a):
+        print(line)
+        
+tt = testclass()
+tt.echo('aaa')
+        
     

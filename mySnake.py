@@ -15,8 +15,8 @@ from pygame.locals import *
 class SnakeGame(object):
     # class attributes
     # a 50x50 gameboard
-    window_height = 100
-    window_width = 100
+    window_height = 1000
+    window_width = 1000
     cell_size = 20
     board_height = int(window_height/cell_size) #5 10 20
     board_width = int(window_width/cell_size)  # 5 10 20
@@ -37,7 +37,7 @@ class SnakeGame(object):
     
     def __init__(self):
         pygame.init()
-        self.speed = 1
+        self.speed = 20
         self.speed_clock = pygame.time.Clock()
         self.score = 0
         self.ate = 0
@@ -66,8 +66,7 @@ class SnakeGame(object):
         self.score = 0
         self.ate = 0
         self.alive = True
-        self.initialize()
-        
+        self.initialize()  
     
     def main(self):
         self.screen = pygame.display.set_mode((SnakeGame.window_width, SnakeGame.window_height))
@@ -117,7 +116,7 @@ class SnakeGame(object):
         self.canPlay = False # wait for agent to play
         self.canRestart = False
             
-        time.sleep(1)
+        #time.sleep(1)
             
         if not self.alive:
             print('end')
@@ -167,6 +166,18 @@ class SnakeGame(object):
             newHead = {'x': self.snake_body[0]['x'] + 1, 'y': self.snake_body[0]['y']}
 
         self.snake_body.insert(0, newHead)
+        
+    def next_head(self, direction):
+        if direction == SnakeGame.UP:
+            newHead = {'x': self.snake_body[0]['x'], 'y': self.snake_body[0]['y'] - 1}
+        elif direction == SnakeGame.DOWN:
+            newHead = {'x': self.snake_body[0]['x'], 'y': self.snake_body[0]['y'] + 1}
+        elif direction == SnakeGame.LEFT:
+            newHead = {'x': self.snake_body[0]['x'] - 1, 'y': self.snake_body[0]['y']}
+        elif direction == SnakeGame.RIGHT:
+            newHead = {'x': self.snake_body[0]['x'] + 1, 'y': self.snake_body[0]['y']}
+            
+        return newHead
     
     def check_alive(self):
         alive = True

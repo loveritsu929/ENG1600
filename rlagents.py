@@ -14,7 +14,7 @@ from mySnake import SnakeGame
 model_file = './learned_model.mdl'
 
 action_dict = {0:'UP' , 1:'DOWN', 2:'LEFT', 3:'RIGHT'}
-EPSILON = 0.7 # Prob. of exploit learned rules
+EPSILON = 0.99 # Prob. of exploit learned rules
 ALPHA = 0.1 # RL learning rate
 BETA = -0.5 # penalty factor for ending early
 GAMMA = 0.9 # discount factor for future reward
@@ -35,6 +35,9 @@ class SimpleAgent(object):
     def manhattan(self):
         return abs(self.game.food['x']-self.game.snake_body[0]['x']) + abs(self.game.food['y']-self.game.snake_body[0]['y'])
     
+    def manhattan_cell(self, cell):
+        return abs(self.game.food['x']-cell['x']) + abs(self.game.food['y']-cell['y'])
+    
     def mat_to_tuple(self, mat):
         if isinstance(mat, np.ndarray):
             return tuple(mat.reshape(1,-1)[0])
@@ -46,6 +49,9 @@ class SimpleAgent(object):
             q_array = self.q_dict[state]
         else:
             q_array = np.array([0.0, 0.0, 0.0, 0.0])
+            for direction in [0, 1, 2, 3]:
+                if direction != self.game.direction:
+                    q_array[direction] = 1.0 / (self.manhattan_cell(self.game.next_head(direction))+1)
             self.q_dict[state] = q_array
         
         return q_array
@@ -81,7 +87,7 @@ class SimpleAgent(object):
             
             # play the game
             while not terminated:
-                time.sleep(1)
+                #time.sleep(1)
                 print(' ')
                 prev_state, A, prev_Q = self.choose_action()
                 print('choose A: ', action_dict[A])
