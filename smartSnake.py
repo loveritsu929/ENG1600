@@ -11,12 +11,14 @@ import pygame
 import sys
 import numpy as np
 from pygame.locals import *
+import torch
+import torch.nn as nn
 
 class PFSnake(object):
     # class attributes
     # a 50x50 gameboard
-    window_height = 400
-    window_width = 400
+    window_height = 100 #400
+    window_width = 100 #400
     cell_size = 20
     board_height = int(window_height/cell_size) #5 10 20
     board_width = int(window_width/cell_size)  # 5 10 20
@@ -43,7 +45,7 @@ class PFSnake(object):
     
     def __init__(self):
         pygame.init()
-        self.speed = 150
+        self.speed = 5
         self.speed_clock = pygame.time.Clock()
         self.score = 0
         self.ate = 0
@@ -75,13 +77,18 @@ class PFSnake(object):
         self.initialize()  
     
     def main(self):
+        while True:
+            self.run()
+            self.restart()
+            
+    def run(self):
         self.screen = pygame.display.set_mode((PFSnake.window_width, PFSnake.window_height))
         self.screen.fill(PFSnake.white)
         pygame.display.set_caption("ENG 1600: SmartSnake")
         
         stopPlay = False
 #        while not stopPlay:
-        while self.check_alive():
+        while self._check_alive():
             print('PFPlay')
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -91,8 +98,7 @@ class PFSnake(object):
             self.draw_game()
             pygame.display.update()
             self.speed_clock.tick(self.speed)
-        print('Got Score: ', self.score, 'isAlive: ', self.alive)
-            #self.restart()
+        print('Got Score: ', self.score)
     
     def PFPlay(self):
         self.reset_board(self.tmp_board, self.snake_body)
@@ -213,26 +219,31 @@ class PFSnake(object):
             
         return newCell
     
-    def check_alive(self):
-        alive = True
-        if self.snake_body[0]['x'] == -1 or \
-        self.snake_body[0]['x'] == PFSnake.board_width or \
-        self.snake_body[0]['y'] == -1 or \
-		self.snake_body[0]['y'] == PFSnake.board_height:
-            alive = False
-                
-        for node in self.snake_body[1:]:
-            if node['x'] == self.snake_body[0]['x'] and \
-            node['y'] == self.snake_body[0]['y']:
-                alive = False
+    def _check_alive(self):
+        alive = False
+        # if there is a empty cell near s_head, return true
+        head = self.snake_body[0]
+        for direction in [0,1,2,3]:
+            if self.is_move_possible(head, direction):
+                alive = True
                 break
-        
+#        if self.snake_body[0]['x'] == -1 or \
+#        self.snake_body[0]['x'] == PFSnake.board_width or \
+#        self.snake_body[0]['y'] == -1 or \
+#		self.snake_body[0]['y'] == PFSnake.board_height:
+#            alive = False
+#                
+#        for node in self.snake_body[1:]:
+#            if node['x'] == self.snake_body[0]['x'] and \
+#            node['y'] == self.snake_body[0]['y']:
+#                alive = False
+#                break
         return alive
         
     def _check_food(self):
         ate = False
         # if end, do nothing
-        if not self.check_alive():
+        if not self._check_alive():
             return
         if self.snake_body[0]['x'] == self.food['x'] and self.snake_body[0]['y'] == self.food['y']:
             self.food = self.generate_food()
@@ -399,9 +410,7 @@ class PFSnake(object):
             food_ate = self.move_virtual_snake(move, virtual_snake)
         
         self.snake_body = snake_backup
-        self.reset_board(self.tmp_board, self.snake_body)
-        
-            
+        self.reset_board(self.tmp_board, self.snake_body)            
         return
     
     def find_path(self):
@@ -412,6 +421,12 @@ class PFSnake(object):
             return self.follow_tail()
         
     
+#### NN #####
+class MyNN(nn.Module):
+    def __init__(self):
+        
+        
+#### NN #####        
 if __name__ == '__main__':
     game = PFSnake()
     game.main()
