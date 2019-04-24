@@ -11,8 +11,7 @@ import pygame
 import sys
 import numpy as np
 from pygame.locals import *
-import torch
-import torch.nn as nn
+
 
 class PFSnake(object):
     # class attributes
@@ -86,14 +85,13 @@ class PFSnake(object):
         self.screen.fill(PFSnake.white)
         pygame.display.set_caption("ENG 1600: SmartSnake")
         
-        stopPlay = False
 #        while not stopPlay:
         while self._check_alive():
             print('PFPlay')
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     pygame.quit()
-            stopPlay = self.PFPlay()
+            self.PFPlay()
             print('Played one step')
             self.draw_game()
             pygame.display.update()
@@ -318,8 +316,8 @@ class PFSnake(object):
                             board[cell['y']][cell['x']] + 1
                         if visited[newCell['y']][newCell['x']] == 0:
                             queue.append(newCell)
-        print('board updated')
-        print(board)
+#        print('board updated')
+#        print(board)
         return found
 
     def get_shortest_safe_move(self, board, snake):
@@ -419,14 +417,7 @@ class PFSnake(object):
             return self.get_shortest_safe_move(self.tmp_board, self.snake_body)
         else:
             return self.follow_tail()
-        
-    
-#### NN #####
-class MyNN(nn.Module):
-    def __init__(self):
-        
-        
-#### NN #####        
+
 if __name__ == '__main__':
     game = PFSnake()
     game.main()

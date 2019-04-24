@@ -28,10 +28,15 @@ class testclass():
     def __init__(self):
         self.a = 1
         
-    def echo(self, line = self.a):
+    def echo(self, line = 1):
         print(line)
+    
+    def change(self, num):
+        num += 1
         
 tt = testclass()
-tt.echo('aaa')
-        
+n = 5
+tt.change(5)
+print(n) 
+
     
