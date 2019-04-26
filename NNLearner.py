@@ -24,6 +24,37 @@ lnR = 1e-3
 batchSize = 32
 optimizer = optim.Adam(model.parameters(), lr = lnR, amsgrad = True)
 
+# like collate_fn in Dataloader; turn a list of samples to tensors
+def my_collate(batch):
+    boards = [torch.as_tensor(item[0]) for item in batch]
+    boards = torch.stack(boards)
+    moves = [item[1] for item in batch]
+    moves = torch.LongTensor(moves)
+    return [boards, moves]
+
+def train(model, criterion, optimizer, batch):
+    # batch: a list of batchSize (board, move)
+    running_loss = 0
+    running_corrects = 0
+    sample, label = my_collate(batch)
+    out = model(sample)
+    loss = criterion(out, label)
+    
+    #update
+    optimizer.zero_grad()
+    loss.backward()
+    optimizer.step()
+    
+    #stats
+    _, preds = torch.max(out, 1) 
+    running_loss += loss.item() * sample.size(0)
+    running_corrects += torch.sum(preds == label.data)
+    
+    print("Train one mini-batch: Loss={:.4f}, Acc={:.4f}".format(
+            running_loss, running_corrects.double()/sample.size(0)))
+    
+    return
+
 class OracleSnake(PFSnake):    
     def __init__(self):
         pygame.init()
@@ -33,6 +64,11 @@ class OracleSnake(PFSnake):
         self.ate = 0
         self.maxScore = PFSnake.board_height * PFSnake.board_width * 10
         self.alive = True
+        
+        # NN part
+        self.model = model
+        self.criterion = criterion
+        self.optimizer = optimizer
         
         #temporary vars; for path finding
         self.tmp_board = np.zeros((PFSnake.board_height, PFSnake.board_width))
@@ -65,12 +101,16 @@ class OracleSnake(PFSnake):
             self.board_dataset[self.dataset_index] = (board, move)
             self.dataset_index += 1
         else:
+            # train one mini-batch
+            train(self.model, self.criterion, self.optimizer, self.board_dataset)
+            
             self.dataset_index = 0
             self.board_dataset = [None]*batchSize
             self.board_dataset[self.dataset_index] = (board, move)
             self.dataset_index += 1
     
-    
+
 if __name__ == '__main__':
+    # need to change the game size first.(VGG input 224*224)
     game = OracleSnake()
     game.main()
